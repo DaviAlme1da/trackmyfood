@@ -2,7 +2,7 @@ package br.com.davi.trackmyfood.core.enums;
 
 public enum StatusOrder {
 
-    CREATE,
+    CREATED,
     IN_PREPARATION,
     OUT_FOR_DELIVERY,
     DELIVERED,
