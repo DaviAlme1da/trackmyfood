@@ -25,5 +25,5 @@ public class DeliveryMan {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private StatusDeliveryMan statusDeliveryMan;
+    private StatusDeliveryMan status;
 }

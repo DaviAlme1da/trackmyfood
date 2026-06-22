@@ -27,7 +27,7 @@ public class Order {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private StatusOrder statusOrder;
+    private StatusOrder status;
 
     @Column(nullable = false)
     private String address;
