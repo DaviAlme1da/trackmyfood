@@ -24,7 +24,7 @@ public class DeliveryLocationService {
     public DeliveryLocationResponse registerLocation(
             DeliveryLocationRequest deliveryLocationRequest
     ){
-        var order = orderService.findById(deliveryLocationRequest.idOrder());
+        var order = orderService.getOrderEntityById(deliveryLocationRequest.idOrder());
         var deliveryMan = deliveryManService.findById(deliveryLocationRequest.idDeliveryMan());
 
        var deliveryLocation = deliveryLocationMapper.toDeliveryLocation(
