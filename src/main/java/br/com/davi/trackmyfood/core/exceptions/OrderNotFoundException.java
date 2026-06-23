@@ -1,6 +1,6 @@
 package br.com.davi.trackmyfood.core.exceptions;
 
-public class OrderNotFoundException extends  NotFoundException{
+public class OrderNotFoundException extends AppException {
 
     public OrderNotFoundException(String message) {
         super(message);

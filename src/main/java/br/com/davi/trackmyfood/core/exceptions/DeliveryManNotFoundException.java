@@ -1,6 +1,6 @@
 package br.com.davi.trackmyfood.core.exceptions;
 
-public class DeliveryManNotFoundException extends NotFoundException {
+public class DeliveryManNotFoundException extends AppException {
 
 
     public DeliveryManNotFoundException(String message) {
