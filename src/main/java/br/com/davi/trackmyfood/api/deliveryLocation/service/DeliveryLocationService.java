@@ -7,6 +7,7 @@ import br.com.davi.trackmyfood.api.deliveryMan.service.DeliveryManService;
 import br.com.davi.trackmyfood.api.order.service.OrderService;
 import br.com.davi.trackmyfood.core.repository.DeliveryLocationRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public class DeliveryLocationService {
     private final DeliveryLocationRepository deliveryLocationRepository;
     private final DeliveryManService deliveryManService;
     private final OrderService orderService;
+    private final SimpMessagingTemplate simpMessagingTemplate;
 
 
     public DeliveryLocationResponse registerLocation(
@@ -35,7 +37,12 @@ public class DeliveryLocationService {
 
        var deliveryLocationSave = deliveryLocationRepository.save(deliveryLocation);
 
-       return deliveryLocationMapper.toResponse(deliveryLocationSave);
+       var response = deliveryLocationMapper.toResponse(deliveryLocationSave);
+       simpMessagingTemplate.convertAndSend(
+               String.format("/topic/order/%d",deliveryLocationRequest.idOrder()),
+               response);
+
+       return response;
     }
 
     public List<DeliveryLocationResponse> findOrderLocationHistoryById(Long idOrder){
