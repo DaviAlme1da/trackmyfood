@@ -2,6 +2,7 @@ package br.com.davi.trackmyfood.api.auth.controllers;
 
 import br.com.davi.trackmyfood.api.auth.dtos.AuthRequest;
 import br.com.davi.trackmyfood.api.auth.dtos.AuthResponse;
+import br.com.davi.trackmyfood.api.auth.dtos.RefreshRequest;
 import br.com.davi.trackmyfood.api.auth.dtos.RegisterRequest;
 import br.com.davi.trackmyfood.api.auth.service.AuthService;
 import jakarta.validation.Valid;
@@ -32,6 +33,14 @@ public class AuthController {
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody AuthRequest request){
 
         var response =  authService.login(request);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthResponse> refresh(@Valid @RequestBody RefreshRequest refreshRequest){
+
+        var response = authService.refresh(refreshRequest);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

@@ -2,6 +2,7 @@ package br.com.davi.trackmyfood.api.auth.service;
 
 import br.com.davi.trackmyfood.api.auth.dtos.AuthRequest;
 import br.com.davi.trackmyfood.api.auth.dtos.AuthResponse;
+import br.com.davi.trackmyfood.api.auth.dtos.RefreshRequest;
 import br.com.davi.trackmyfood.api.auth.dtos.RegisterRequest;
 import br.com.davi.trackmyfood.api.auth.mappers.AuthMapper;
 import br.com.davi.trackmyfood.core.exceptions.EmailAlreadyExistsException;
@@ -59,5 +60,19 @@ public class AuthService {
         var refreshToken = jwtService.generateRefreshToken(user.getEmail());
 
         return authMapper.toAuthResponse(user, accessToken, refreshToken);
+    }
+
+    public AuthResponse refresh(RefreshRequest refreshRequest){
+
+        var email = jwtService.getSubFromRefreshToken(refreshRequest.refreshToken());
+
+        var user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        var accessToken = jwtService.generateAccessToken(user.getEmail());
+        var refreshToken = jwtService.generateRefreshToken(user.getEmail());
+
+        return authMapper.toAuthResponse(user, accessToken, refreshToken);
+
     }
 }

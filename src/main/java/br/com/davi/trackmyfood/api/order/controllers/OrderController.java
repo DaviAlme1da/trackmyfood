@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,7 +19,8 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping
-    public ResponseEntity<?> create(@Valid @RequestBody OrderRequest orderRequest) {
+    @PreAuthorize("hasRole('CUSTOMER')")
+    public ResponseEntity<OrderResponse> create(@Valid @RequestBody OrderRequest orderRequest) {
 
             var order = orderService.create(orderRequest);
 
@@ -27,6 +29,7 @@ public class OrderController {
     }
 
     @PatchMapping("/{id}/status")
+    @PreAuthorize("hasRole('DELIVERY_MAN')")
     public ResponseEntity<?> updateStatus(
             @Valid @RequestBody UpdateOrderStatusRequest updateOrderStatusRequest,
             @PathVariable Long id){
