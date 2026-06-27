@@ -5,6 +5,7 @@ import br.com.davi.trackmyfood.api.deliveryLocation.mappers.DeliveryLocationMapp
 import br.com.davi.trackmyfood.api.deliveryMan.service.DeliveryManService;
 import br.com.davi.trackmyfood.api.order.service.OrderService;
 import br.com.davi.trackmyfood.core.repository.DeliveryLocationRepository;
+import br.com.davi.trackmyfood.messaging.publisher.LocationEventPublisher;
 import br.com.davi.trackmyfood.testutils.factories.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,13 +13,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
@@ -38,7 +36,7 @@ class DeliveryLocationServiceTest {
     private OrderService orderService;
 
     @Mock
-    private SimpMessagingTemplate simpMessagingTemplate;
+    LocationEventPublisher locationEventPublisher;
 
     @InjectMocks
     private DeliveryLocationService deliveryLocationService;
@@ -68,10 +66,7 @@ class DeliveryLocationServiceTest {
 
         verify(deliveryLocationRepository).save(deliveryLocation);
 
-        verify(simpMessagingTemplate).convertAndSend(
-                eq("/topic/order/1"),
-                eq(response)
-        );
+        verify(locationEventPublisher).publish(response);
     }
 
     @Test
@@ -96,29 +91,6 @@ class DeliveryLocationServiceTest {
         verify(deliveryManService).findById(1L);
 
         verify(deliveryLocationMapper).toDeliveryLocation(request, order, deliveryMan);
-    }
-
-    @Test
-    @DisplayName("registerLocation: deve publicar no tópico correto baseado no idOrder")
-    void registerLocation_shouldPublishToCorrectTopic_basedOnOrderId() {
-        var request = DeliveryLocationRequestFactory.create();
-        var order = OrderFactory.create();
-        var deliveryMan = DeliverymanFactory.create();
-        var deliveryLocation = DeliveryLocationFactory.create();
-        var response = DeliveryLocationResponseFactory.create();
-
-        given(orderService.getOrderEntityById(1L)).willReturn(order);
-        given(deliveryManService.findById(1L)).willReturn(deliveryMan);
-        given(deliveryLocationMapper.toDeliveryLocation(any(), any(), any())).willReturn(deliveryLocation);
-        given(deliveryLocationRepository.save(any())).willReturn(deliveryLocation);
-        given(deliveryLocationMapper.toResponse(any())).willReturn(response);
-
-        deliveryLocationService.registerLocation(request);
-
-        verify(simpMessagingTemplate).convertAndSend(
-                eq("/topic/order/1"),
-                (Object) any()
-        );
     }
 
     @Test
