@@ -45,4 +45,7 @@ public class Order {
     @Column(nullable = false, updatable = false)
     private LocalDateTime creationDate;
 
+    @ManyToOne
+    @JoinColumn(nullable = false)
+    private Customer customer;
 }
