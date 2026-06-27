@@ -7,11 +7,15 @@ import br.com.davi.trackmyfood.api.order.dtos.UpdateOrderStatusRequest;
 import br.com.davi.trackmyfood.api.order.mappers.OrderMapper;
 import br.com.davi.trackmyfood.core.enums.StatusDeliveryMan;
 import br.com.davi.trackmyfood.core.enums.StatusOrder;
+import br.com.davi.trackmyfood.core.enums.UserRole;
 import br.com.davi.trackmyfood.core.exceptions.BusinessException;
 import br.com.davi.trackmyfood.core.exceptions.OrderNotFoundException;
+import br.com.davi.trackmyfood.core.model.Customer;
 import br.com.davi.trackmyfood.core.model.Order;
 import br.com.davi.trackmyfood.core.repository.OrderRepository;
+import br.com.davi.trackmyfood.core.services.auth.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -26,6 +30,16 @@ public class OrderService {
 
         var order = orderMapper.toOrder(orderRequest);
 
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        var userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
+        if(userDetails.getUser().getRole().equals(UserRole.ROLE_DELIVERY_MAN)){
+            throw new BusinessException("Only customers can create orders");
+        }
+
+        var customer = (Customer) userDetails.getUser();
+
+        order.setCustomer(customer);
         order.setStatus(StatusOrder.CREATED);
 
         var orderSave = orderRepository.save(order);
