@@ -1,7 +1,7 @@
 <h1 align="center">TrackMyFood</h1>
 
 <p align="center">
-  <img loading="lazy" src="https://img.shields.io/badge/status-em%20desenvolvimento-yellow?style=for-the-badge"/>
+  <img loading="lazy" src="https://img.shields.io/badge/status-finalizado-brightgreen?style=for-the-badge"/>
   <img loading="lazy" src="https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=java&logoColor=white"/>
   <img loading="lazy" src="https://img.shields.io/badge/Spring%20Boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white"/>
   <img loading="lazy" src="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white"/>
