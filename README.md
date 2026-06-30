@@ -26,7 +26,7 @@ Quando um pedido é marcado como "saiu para entrega", a API calcula a rota entre
 
 ---
 
-## ⚙️ Arquitetura
+## Arquitetura
 
 ```
 Cliente ── cria pedido ──► Order Service ──► PostgreSQL
@@ -165,7 +165,7 @@ Os clientes se conectam através do endpoint `/ws` (SockJS).
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
 - Java 21
 - Spring Boot
@@ -187,7 +187,7 @@ O projeto conta com testes unitários cobrindo as principais regras de negócio 
 
 ---
 
-## 👨‍💻 Autor
+##  Autor
 
 <p>
 Desenvolvido por <strong>Davi Lucas de Almeida</strong>.<br>
