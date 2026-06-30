@@ -17,6 +17,30 @@ public class RabbitMQConfig {
     public static final String EXCHANGE = "location.exchange";
     public static final String ROUTING_KEY = "location.routing-key";
 
+    public static final String ROUTE_QUEUE = "route.queue";
+    public static final String ROUTE_EXCHANGE  = "route.exchange";
+    public static final String ROUTE_ROUTING_KEY  = "route.routing-key";
+
+
+    @Bean
+    public Queue routeQueue() {
+        return new Queue(ROUTE_QUEUE, true);
+    }
+
+    @Bean
+    public DirectExchange routeExchange() {
+        return new DirectExchange(ROUTE_EXCHANGE);
+    }
+
+    @Bean
+    public Binding routeBinding(Queue routeQueue, DirectExchange routeExchange) {
+        return BindingBuilder
+                .bind(routeQueue)
+                .to(routeExchange)
+                .with(ROUTE_ROUTING_KEY);
+    }
+
+
     @Bean
     public Queue queue() {
         return new Queue(QUEUE, true);
