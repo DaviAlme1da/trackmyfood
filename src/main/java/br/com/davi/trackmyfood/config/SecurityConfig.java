@@ -30,6 +30,7 @@ public class SecurityConfig {
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/ws/**").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll() // adicione esta linha
                         .anyRequest().authenticated()
                 )
                 .csrf(AbstractHttpConfigurer::disable)
