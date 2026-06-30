@@ -36,6 +36,7 @@ public class AuthMapperImpl implements AuthMapper {
     @Override
     public AuthResponse toAuthResponse(User user, String accessToken, String refreshToken) {
         return AuthResponse.builder()
+                .id(user.getId())
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .name(user.getName())
