@@ -16,7 +16,7 @@ Projeto de API para rastreamento de entregas de comida em tempo real, desenvolvi
 
 ## 📌 Sobre o projeto
 
-O TrackMyFood é um backend que simula uma plataforma de delivery de comida (similar ao iFood/Uber Eats). Clientes podem criar pedidos, entregadores podem aceitá-los e atualizar seu status, e tanto o status do pedido quanto a localização do entregador são transmitidos em tempo real via WebSocket.
+O TrackMyFood é um backend que simula uma plataforma de delivery de comida. Clientes podem criar pedidos, entregadores podem aceitá-los e atualizar seu status, e tanto o status do pedido quanto a localização do entregador são transmitidos em tempo real via WebSocket.
 
 O sistema possui dois tipos de usuário:
 - **Customer (Cliente)**: cria pedidos e acompanha a entrega em tempo real.
