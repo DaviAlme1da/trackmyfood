@@ -3,12 +3,16 @@ package br.com.davi.trackmyfood.api.order.service;
 import br.com.davi.trackmyfood.api.deliveryMan.service.DeliveryManService;
 import br.com.davi.trackmyfood.api.order.dtos.UpdateOrderStatusRequest;
 import br.com.davi.trackmyfood.api.order.mappers.OrderMapper;
+import br.com.davi.trackmyfood.api.route.dtos.RouteResponse;
+import br.com.davi.trackmyfood.api.route.service.RouteService;
 import br.com.davi.trackmyfood.core.enums.StatusDeliveryMan;
 import br.com.davi.trackmyfood.core.enums.StatusOrder;
 import br.com.davi.trackmyfood.core.exceptions.BusinessException;
 import br.com.davi.trackmyfood.core.exceptions.OrderNotFoundException;
+import br.com.davi.trackmyfood.core.repository.DeliveryLocationRepository;
 import br.com.davi.trackmyfood.core.repository.OrderRepository;
 import br.com.davi.trackmyfood.core.services.auth.UserDetailsImpl;
+import br.com.davi.trackmyfood.messaging.publisher.RouteEventPublisher;
 import br.com.davi.trackmyfood.testutils.factories.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -25,6 +29,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -40,6 +45,15 @@ class OrderServiceTest {
 
     @Mock
     private DeliveryManService deliveryManService;
+
+    @Mock
+    private DeliveryLocationRepository deliveryLocationRepository;
+
+    @Mock
+    private RouteService routeService;
+
+    @Mock
+    private RouteEventPublisher routeEventPublisher;
 
     @InjectMocks
     private OrderService orderService;
@@ -146,6 +160,8 @@ class OrderServiceTest {
 
         given(orderRepository.findById(1L)).willReturn(Optional.of(order));
         given(deliveryManService.findById(1L)).willReturn(deliveryMan);
+        given(deliveryLocationRepository.findTopByDeliveryManIdOrderByTimestampDesc(deliveryMan.getId()))
+                .willReturn(Optional.empty());
 
         orderService.updateStatus(1L, request);
 
@@ -157,6 +173,51 @@ class OrderServiceTest {
                 StatusDeliveryMan.ON_DELIVERY
         );
         verify(orderRepository).save(order);
+        verify(routeService, never()).calculateRoute(any(), any(), any(), any(), any());
+        verify(routeEventPublisher, never()).publish(any());
+    }
+
+    @Test
+    @DisplayName("updateStatus: deve calcular e publicar rota usando o id do pedido atual quando OUT_FOR_DELIVERY e há localização anterior do entregador")
+    void updateStatus_shouldCalculateRouteWithCurrentOrderId_whenOutForDeliveryAndDeliveryManHasLocation() {
+        var order = OrderFactory.create();
+        order.setId(1L);
+
+        var previousOrder = OrderFactory.create();
+        previousOrder.setId(99L);
+
+        var deliveryMan = DeliverymanFactory.create();
+        var previousLocation = DeliveryLocationFactory.create();
+        previousLocation.setOrder(previousOrder);
+
+        var request = new UpdateOrderStatusRequest(StatusOrder.OUT_FOR_DELIVERY, 1L);
+        var routeResponse = RouteResponse.builder().idOrder(1L).coordinates(java.util.List.of()).build();
+
+        given(orderRepository.findById(1L)).willReturn(Optional.of(order));
+        given(deliveryManService.findById(1L)).willReturn(deliveryMan);
+        given(deliveryLocationRepository.findTopByDeliveryManIdOrderByTimestampDesc(deliveryMan.getId()))
+                .willReturn(Optional.of(previousLocation));
+        given(routeService.calculateRoute(
+                eq(order.getId()),
+                eq(previousLocation.getLatitude()),
+                eq(previousLocation.getLongitude()),
+                eq(order.getLatitudeAddress()),
+                eq(order.getLongitudeAddress())
+        )).willReturn(routeResponse);
+
+        orderService.updateStatus(1L, request);
+
+        verify(routeService).calculateRoute(
+                eq(order.getId()),
+                eq(previousLocation.getLatitude()),
+                eq(previousLocation.getLongitude()),
+                eq(order.getLatitudeAddress()),
+                eq(order.getLongitudeAddress())
+        );
+        verify(routeService, never()).calculateRoute(
+                eq(previousOrder.getId()), any(), any(), any(), any()
+        );
+        verify(routeEventPublisher).publish(routeResponse);
     }
 
     @Test
