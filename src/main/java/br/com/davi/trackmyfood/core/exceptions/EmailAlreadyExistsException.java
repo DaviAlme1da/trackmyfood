@@ -6,6 +6,6 @@ public class EmailAlreadyExistsException extends AppException{
     }
 
     public EmailAlreadyExistsException() {
-        super("The email does not exist.");
+        super("Email already in use.");
     }
 }
