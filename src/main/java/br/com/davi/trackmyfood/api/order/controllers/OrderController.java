@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/orders")
@@ -45,6 +47,20 @@ public class OrderController {
             var order = orderService.findById(id);
             return  ResponseEntity.status(HttpStatus.OK).body(order);
 
+    }
+
+    @GetMapping
+    @PreAuthorize("hasRole('DELIVERY_MAN')")
+    public ResponseEntity<List<OrderResponse>> listAvailable() {
+        var orders = orderService.listAvailableOrders();
+        return ResponseEntity.ok(orders);
+    }
+
+    @GetMapping("/my")
+    @PreAuthorize("hasRole('CUSTOMER')")
+    public ResponseEntity<List<OrderResponse>> listMyOrders() {
+        var orders = orderService.listMyOrders();
+        return ResponseEntity.ok(orders);
     }
 }
 
